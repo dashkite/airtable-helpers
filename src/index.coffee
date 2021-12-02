@@ -19,6 +19,14 @@ class Base
         else
           resolve records[0]
 
+  find: ({ table, id }) ->
+    new Promise (resolve, reject) =>
+      ( @_.base table ).find id, (error, record) ->
+        if error?
+          reject error
+        else
+        resolve record
+
 export {
   Base
 }
