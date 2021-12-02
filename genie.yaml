@@ -1,0 +1,21 @@
+presets:
+  verify: null
+  update: null
+  release: null
+  coffeescript:
+    targets:
+      node:
+        - preset: node
+          glob:
+            - '{src,test}/**/*.coffee'
+  yaml:
+    targets:
+      node:
+        - preset: js
+          glob:
+            - "{src,test}/**/*.yaml"
+  esm: null
+sky:
+  secrets:
+    - name: dashkite-airtable-api-key
+      type: prompt
