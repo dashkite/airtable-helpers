@@ -8,6 +8,12 @@ presets:
         - preset: node
           glob:
             - '{src,test}/**/*.coffee'
+  pug:
+    targets:
+      node:
+        - preset: compile
+          glob:
+            - "test/**/*.pug"
   yaml:
     targets:
       node:
