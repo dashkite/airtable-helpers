@@ -1,3 +1,4 @@
+import * as Fn from "@dashkite/joy/function"
 import * as Meta from "@dashkite/joy/metaclass"
 import * as Arr from "@dashkite/joy/array"
 import * as It from "@dashkite/joy/iterable"
@@ -18,12 +19,14 @@ table = (table) ->
       for id in ids when ! (( @_.cms[ id ]? ) || ( id in @_.pending ))
         @_.pending.push id
       type._.pending = It.uniqueBy eq, Arr.cat ids, type._.pending
-    type.load = (base) ->
+    type.load = ({ base, site }) ->
       unless @_.pending.length == 0
         records = await base.findAll table: @table, ids: @_.pending
         @_.pending = []
         for record in records
-          @_.cms[ record.id ] = @fromRecord record
+          object = @fromRecord record
+          object.site = site
+          @_.cms[ record.id ] = object
 
 fields = (map) ->
 
@@ -37,14 +40,17 @@ fields = (map) ->
     Meta.mixin type::, do ->
       for name, description of map
         Meta.getter name, do (name, description) ->
-          if description.list?
-            ->
-              @_list ?=
-                description.list.fromID id for id in ( toArray @_.get description.from )
-          else if description.transform?
-            -> description.transform.call @, @_.get description.from
-          else
-            -> @_.get description.from
+          description.transform ?= do ->
+            if description.list?
+              (value) ->
+                if value?
+                  description.list.fromID id for id in ( toArray value )
+                else
+                  []
+            else
+              Fn.identity
+
+          -> description.transform.call @, @_.get description.from
 
 export {
   table

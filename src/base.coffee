@@ -47,7 +47,6 @@ class Base
             "RECORD_ID() = '#{id}'"
         "OR( #{ It.join ", ", conditions })"
 
-
 export {
   Base
 }

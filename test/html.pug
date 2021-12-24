@@ -1,0 +1,234 @@
+mixin image(description)
+  picture
+    if description.dark
+      source(
+        srcset = description.dark.url
+        media = "(prefers-color-scheme: dark)"
+      )
+    img( src = description.default.url )
+
+mixin headings(description)
+  if description.boost
+    h1= description.title
+    if description.subtitle
+      h2= description.subtitle
+  else
+    h2= description.title
+    if description.subtitle
+      h3= description.subtitle
+
+mixin byline(description)
+  .byline
+    span.published= description.published
+    .authors
+      each author in description.authors
+        span.author= author.name
+
+mixin content-banner(description)
+  section
+    header
+      +headings(description)
+    .main
+      .content
+        if description.copy
+          != description.copy
+    footer
+      if description.hasSocials
+        +socials(description)
+
+mixin content-copy(description)
+  section
+    header
+      +headings(description)
+    .main
+      .content
+        if description.copy
+          if description.glyph
+            i( class = description.glyph )
+          != description.copy
+      aside
+        if description.image
+          +image(description.image)
+    footer
+      if description.hasSocials
+        +socials(description)
+
+mixin content-article(description)
+  article
+    header
+      +headings(description)
+      +byline(description)
+    .main
+      .content
+        if description.copy
+          if description.glyph
+            i( class = description.glyph )
+          != description.copy
+      aside
+        if description.image
+          +image(description.image)
+    footer
+      if description.hasSocials
+        +socials(description)
+
+mixin content-image(description)
+  section
+    a( href = description.link )
+      +image( description.image )
+
+mixin content-nav(description)
+  nav
+    each page in description.pages
+      a( href = page.link )= page.title
+
+mixin content-button(description)
+  section
+    a( href = description.link || description.pages[0].link )
+      if description.image
+        +image( description.image )
+      span= description.title
+
+mixin socials(description)
+  section.socials
+    if description.social.github
+      a(href = description.social.github)
+        i.fab.fa-github
+        span GitHub
+    if description.social.linkedin
+      a(href = description.social.linkedin)
+        i.fab.fa-linkedin
+        span LinkedIn
+    if description.social.twitter
+      a(href = description.social.twitter)
+        i.fab.fa-twitter
+        span Twitter
+    if description.social.blog
+      a(href = description.social.blog)
+        i.far.fa-paragraph
+        span Blog
+
+mixin summary-article(description)
+  .block( name = description.name class = description.classes ) 
+    section
+      header
+        a( href = description.path )
+          +headings(description)
+          +byline(description)
+      .main
+        .content      
+          if description.blurb
+            if description.glyph
+              i( class = description.glyph )
+            != description.blurb
+        aside
+          if description.image
+            +image(description.image)
+      footer
+        if description.hasSocials
+          +socials(description)
+
+mixin summary(description)
+  if description.type == "article"
+    +summary-article(description)
+  else
+    +content(description)
+
+mixin content-collection(description)
+  section
+    header
+      +headings(description)
+      section!= description.copy
+    .main
+      each item in description.content
+        +summary(item)
+
+mixin header-copy(description)
+  if description.hints.includes("largest")
+    h1= description.title
+    +socials(description)
+  else
+    +content-copy(description)
+
+mixin content(description)
+  .block( name = description.name class = description.classes ) 
+    if description.type == "banner"
+      +content-banner(description)   
+    else if description.type == "nav"
+      +content-nav(description)
+    else if description.type == "copy"
+      +content-copy(description)
+    else if description.type == "article"
+      +content-article(description)
+    else if description.type == "image"
+      +content-image(description)
+    else if description.type == "button"
+      +content-button(description)
+    else if description.type == "collection"
+      +content-collection(description)
+    else
+      +content-copy(description)
+
+mixin header-content(description)
+  if description.type == "copy"
+    +header-copy(description)
+  else
+    +content(description)
+
+mixin footer-content(description)
+  +content(description)
+
+doctype html
+html( class = `${layout} ${theme}`)
+  head
+    title= title
+    meta( key = "charset" charset = "utf-8" )
+    meta(
+      key = "viewport"
+      name = "viewport"
+      content = "width=device-width, initial-scale=1.0"
+    )
+    //- link( key = "icon" rel = "shortcut icon" href = "/media/images/favicon.ico" )
+    link( rel = "stylesheet" href = "/dashkite/assets/css/sites.css" )
+
+    script(
+      src = "https://kit.fontawesome.com/2a37c5fc17.js"
+      crossorigin = "anonymous"
+    )
+    each content in main
+      if content.type == "banner" && content.image
+        style.
+          main > .block[name='#{content.name}'] {
+            background-image: var(--background-gradient), url(#{content.image.default.url})
+          }
+        if content.image.dark && theme.includes("preferred")
+          style( media = "(prefers-color-scheme: dark)").
+            main > .block[name='#{content.name}'] {
+              background-image: var(--background-gradient), url(#{content.image.dark.url})
+            }
+    if fonts
+      link( rel="preconnect" href="https://fonts.googleapis.com" )
+      link( rel="preconnect" href="https://fonts.gstatic.com" crossorigin )
+      each name, type in fonts
+        if name
+          link( 
+            href=`https://fonts.googleapis.com/css2?family=${name}&display=swap`
+            rel="stylesheet"
+          )
+          style.
+            :root {
+              --#{type}-font: "#{name}";
+            }
+  body
+    header
+      each content in header
+        +header-content( content )
+    main
+      each content in main
+        +content( content )
+      if aside
+        aside
+          each content in aside
+            +content( content )
+    footer
+      each content in footer
+        +footer-content( content )

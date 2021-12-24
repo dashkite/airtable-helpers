@@ -18,6 +18,8 @@ presets:
     targets:
       node:
         - preset: js
+          options:
+            target: node
           glob:
             - "{src,test}/**/*.yaml"
   esm: null
