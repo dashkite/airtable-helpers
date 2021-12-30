@@ -1,21 +1,28 @@
 mixin image(description)
-  picture
-    if description.dark
-      source(
-        srcset = description.dark.url
-        media = "(prefers-color-scheme: dark)"
+  figure
+    picture
+      if description.dark
+        source(
+          srcset = description.dark.url
+          media = "(prefers-color-scheme: dark)"
+        )
+      img(
+        alt = description.title 
+        src = description.default.url 
       )
-    img( src = description.default.url )
+    if description.copy
+      figcaption!= description.copy
 
 mixin headings(description)
-  if description.boost
-    h1= description.title
-    if description.subtitle
-      h2= description.subtitle
-  else
-    h2= description.title
-    if description.subtitle
-      h3= description.subtitle
+  if description.title
+    if description.boost
+      h1= description.title
+      if description.subtitle
+        h2= description.subtitle
+    else
+      h2= description.title
+      if description.subtitle
+        h3= description.subtitle
 
 mixin byline(description)
   .byline
@@ -29,26 +36,23 @@ mixin content-banner(description)
     header
       +headings(description)
     .main
-      .content
-        if description.copy
-          != description.copy
+      if description.copy
+        != description.copy
     footer
       if description.hasSocials
         +socials(description)
 
-mixin content-copy(description)
+mixin content-section(description)
   section
     header
       +headings(description)
     .main
-      .content
-        if description.copy
-          if description.glyph
-            i( class = description.glyph )
-          != description.copy
-      aside
-        if description.image
-          +image(description.image)
+      if description.copy
+        if description.glyph
+          i( class = description.glyph )
+        != description.copy
+      if description.image
+        +image(description.image)
     footer
       if description.hasSocials
         +socials(description)
@@ -59,14 +63,12 @@ mixin content-article(description)
       +headings(description)
       +byline(description)
     .main
-      .content
-        if description.copy
-          if description.glyph
-            i( class = description.glyph )
-          != description.copy
-      aside
-        if description.image
-          +image(description.image)
+      if description.copy
+        if description.glyph
+          i( class = description.glyph )
+        != description.copy
+      if description.image
+        +image(description.image)
     footer
       if description.hasSocials
         +socials(description)
@@ -83,7 +85,7 @@ mixin content-nav(description)
 
 mixin content-button(description)
   section
-    a( href = description.link || description.pages[0].link )
+    a.copy( href = description.link || description.pages[0].link )
       if description.image
         +image( description.image )
       span= description.title
@@ -109,23 +111,21 @@ mixin socials(description)
 
 mixin summary-article(description)
   .block( name = description.name class = description.classes ) 
-    section
-      header
-        a( href = description.path )
+    a( href = description.path )
+      section
+        header
           +headings(description)
           +byline(description)
-      .main
-        .content      
+        .main
           if description.blurb
             if description.glyph
               i( class = description.glyph )
             != description.blurb
-        aside
           if description.image
             +image(description.image)
-      footer
-        if description.hasSocials
-          +socials(description)
+        footer
+          if description.hasSocials
+            +socials(description)
 
 mixin summary(description)
   if description.type == "article"
@@ -147,7 +147,7 @@ mixin header-copy(description)
     h1= description.title
     +socials(description)
   else
-    +content-copy(description)
+    +content-section(description)
 
 mixin content(description)
   .block( name = description.name class = description.classes ) 
@@ -155,8 +155,8 @@ mixin content(description)
       +content-banner(description)   
     else if description.type == "nav"
       +content-nav(description)
-    else if description.type == "copy"
-      +content-copy(description)
+    else if description.type == "section"
+      +content-section(description)
     else if description.type == "article"
       +content-article(description)
     else if description.type == "image"
@@ -166,7 +166,7 @@ mixin content(description)
     else if description.type == "collection"
       +content-collection(description)
     else
-      +content-copy(description)
+      +content-section(description)
 
 mixin header-content(description)
   if description.type == "copy"
@@ -218,6 +218,9 @@ html( class = `${layout} ${theme}`)
             :root {
               --#{type}-font: "#{name}";
             }
+    each content in head
+      if content.type == "embed"
+        != content.copy
   body
     header
       each content in header

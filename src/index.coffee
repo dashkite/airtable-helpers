@@ -88,6 +88,7 @@ Meta.mixin Page, [
       title: from: "Title"
       theme: from: "Theme", transform: buildClassList
       layout: from: "Layout", transform: buildClassList
+      head: from: "Head", list: Content
       header: from: "Header", list: Content
       main: from: "Main", list: Content
       aside: from: "Aside", list: Content
