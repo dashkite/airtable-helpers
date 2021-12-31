@@ -1,17 +1,4 @@
-mixin image(description)
-  figure
-    picture
-      if description.dark
-        source(
-          srcset = description.dark.url
-          media = "(prefers-color-scheme: dark)"
-        )
-      img(
-        alt = description.title 
-        src = description.default.url 
-      )
-    if description.copy
-      figcaption!= description.copy
+include ./mixins
 
 mixin headings(description)
   if description.title
@@ -52,7 +39,7 @@ mixin content-section(description)
           i( class = description.glyph )
         != description.copy
       if description.image
-        +image(description.image)
+        +figure(description.image)
     footer
       if description.hasSocials
         +socials(description)
@@ -66,9 +53,7 @@ mixin content-article(description)
       if description.copy
         if description.glyph
           i( class = description.glyph )
-        != description.copy
-      if description.image
-        +image(description.image)
+        != description.copyWithFigures
     footer
       if description.hasSocials
         +socials(description)
@@ -76,7 +61,7 @@ mixin content-article(description)
 mixin content-image(description)
   section
     a( href = description.link )
-      +image( description.image )
+      +figure( description.image )
 
 mixin content-nav(description)
   nav
@@ -87,7 +72,7 @@ mixin content-button(description)
   section
     a.copy( href = description.link || description.pages[0].link )
       if description.image
-        +image( description.image )
+        +figure( description.image )
       span= description.title
 
 mixin socials(description)
@@ -122,7 +107,7 @@ mixin summary-article(description)
               i( class = description.glyph )
             != description.blurb
           if description.image
-            +image(description.image)
+            +figure(description.image)
         footer
           if description.hasSocials
             +socials(description)
@@ -134,7 +119,7 @@ mixin summary(description)
     +content(description)
 
 mixin content-collection(description)
-  section
+  section 
     header
       +headings(description)
       section!= description.copy
@@ -142,7 +127,7 @@ mixin content-collection(description)
       each item in description.content
         +summary(item)
 
-mixin header-copy(description)
+mixin header-section(description)
   if description.hints.includes("largest")
     h1= description.title
     +socials(description)
@@ -169,8 +154,8 @@ mixin content(description)
       +content-section(description)
 
 mixin header-content(description)
-  if description.type == "copy"
-    +header-copy(description)
+  if description.type == "section"
+    +header-section(description)
   else
     +content(description)
 

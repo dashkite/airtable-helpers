@@ -1,0 +1,14 @@
+mixin figure(description)
+  figure
+    picture
+      if description.dark
+        source(
+          srcset = description.dark.url
+          media = "(prefers-color-scheme: dark)"
+        )
+      img(
+        alt = description.title 
+        src = description.default.url 
+      )
+    if description.copy
+      figcaption!= description.copy

@@ -7,7 +7,7 @@ import configuration from "./configuration"
 import { Base } from "../src/base"
 import { Site, Content } from "../src"
 
-import html from "./html"
+import html from "./helpers/html"
 
 test = (name, f) ->
   _test

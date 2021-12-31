@@ -162,6 +162,7 @@ Content.find = ({ site, name }) ->
     page = await Page.load { base, site }
     # remember which site we're on
     page.site = site
+    self.site = site
 
     # load all the related content
     await Content.load { base, site }
@@ -225,6 +226,7 @@ Meta.mixin Image, [
   fields
     attachments: from: "Attachments"
     description: from: "Description"
+    caption: from: "Caption"
 ]
 
 Meta.mixin Image::, [
