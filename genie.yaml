@@ -23,7 +23,3 @@ presets:
           glob:
             - "{src,test}/**/*.yaml"
   esm: null
-sky:
-  secrets:
-    - name: dashkite-airtable-api-key
-      type: prompt

@@ -46,6 +46,7 @@ class Image
 Meta.mixin Site, [
   table "Sites"
   fields
+    key: from: "Account Name", transform: (name) -> "dashkite-sites-#{name}-airtable-key"
     base: from: "Base"
     name: from: "Name"
 ]
@@ -115,32 +116,33 @@ Meta.mixin Page::, [
 Page.find = ({ site, path }) ->
 
   if site? && path?
-    { key } = Site.configuration
-    base = await Base.create { key, base: site.base }
+    base = await Base.create site
     # see note above for Site....
     self = @fromRecord await base.selectOne
       table: @table
       query: "{Path} = '#{path}'"
 
-    # remember which site we're on
-    self.site = site
+    if self?
+      
+      # remember which site we're on
+      self.site = site
 
-    # there's probably a way to do this automatically
-    # but i initially just want to make sure the mechanics
-    # are all working
+      # there's probably a way to do this automatically
+      # but i initially just want to make sure the mechanics
+      # are all working
 
-    # okay get the content for the pages
-    await Content.load { base, site }
-    # repeat for nested content
-    # we only do this for one level tho
-    await Page.load { base, site }
-    await Content.load { base, site }
-    # finally, we can load all the images at once
-    await Image.load { base, site }
-    await People.load { base, site }
-    self
+      # okay get the content for the pages
+      await Content.load { base, site }
+      # repeat for nested content
+      # we only do this for one level tho
+      await Page.load { base, site }
+      await Content.load { base, site }
+      # finally, we can load all the images at once
+      await Image.load { base, site }
+      await People.load { base, site }
+      self
   else
-    throw new Error "Page only supporsts find by site and path"
+    throw new Error "Page only supports find by site and path"
 
 ### Content ###
 

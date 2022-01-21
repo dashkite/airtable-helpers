@@ -11,9 +11,10 @@ table = (table) ->
       pending: []
     type.table = table
     type.fromRecord = (record) ->
-      self = Object.assign (new type), _: record
-      self.prepare?()
-      self
+      if record?
+        self = Object.assign (new type), _: record
+        self.prepare?()
+        self
     type.fromID = (id) -> @_.cms[ id ]
     type.enqueue = (ids) ->
       for id in ids when ! (( @_.cms[ id ]? ) || ( id in @_.pending ))
@@ -27,6 +28,11 @@ table = (table) ->
           object = @fromRecord record
           object.site = site
           @_.cms[ record.id ] = object
+    type::save = ->
+      @site.base.update 
+        table: @constructor.table
+        id: @_.id
+        fields: @changes
 
 fields = (map) ->
 
@@ -39,18 +45,24 @@ fields = (map) ->
 
     Meta.mixin type::, do ->
       for name, description of map
-        Meta.getter name, do (name, description) ->
-          description.transform ?= do ->
-            if description.list?
-              (value) ->
-                if value?
-                  description.list.fromID id for id in ( toArray value )
-                else
-                  []
-            else
-              Fn.identity
-
-          -> description.transform.call @, @_.get description.from
+        do (name, description) ->
+          if description.list?
+            Meta.getter name, ->
+              if ( value = @_.get description.from )?
+                description.list.fromID id for id in ( toArray value )
+              else
+                []
+          else if description.transform?
+            Meta.getter name, ->
+              if ( value = @_.get description.from )?
+                description.transform.call @, value
+          else
+            # TODO handle mapping linked objects?
+            Meta.property name,
+              get: -> @changes?[ description.from ] ? @_.get description.from
+              set: (value) ->
+                @changes ?= {}
+                @changes[ description.from ] = value
 
 export {
   table

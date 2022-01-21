@@ -47,6 +47,14 @@ class Base
             "RECORD_ID() = '#{id}'"
         "OR( #{ It.join ", ", conditions })"
 
+  update: ({ table, id, fields }) ->
+    new Promise ( resolve, reject ) =>
+      ( @_.base table ).update [ { id, fields } ], (error, records) ->
+        if error?
+          reject error
+        else
+          resolve records[0]
+
 export {
   Base
 }
