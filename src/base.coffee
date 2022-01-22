@@ -21,10 +21,13 @@ class Base
           resolve records[0]
 
   selectAll: ({ table, query }) ->
-    query = ( @_.base table ).select
-      filterByFormula: query
+    table = @_.base table
+    result = if query?
+      table.select filterByFormula: query
+    else
+      table.select()
     new Promise (resolve, reject) ->
-      query.firstPage (error, records) ->
+      result.firstPage (error, records) ->
         if error?
           reject error
         else
@@ -47,6 +50,15 @@ class Base
             "RECORD_ID() = '#{id}'"
         "OR( #{ It.join ", ", conditions })"
 
+  create: ({ table, records }) ->
+    new Promise ( resolve, reject ) =>
+      ( @_.base table ).create ( fields: record for record in records ), ( error, records ) ->
+        if error?
+          reject error
+        else
+          resolve records
+
+
   update: ({ table, id, fields }) ->
     new Promise ( resolve, reject ) =>
       ( @_.base table ).update [ { id, fields } ], (error, records) ->
@@ -54,6 +66,14 @@ class Base
           reject error
         else
           resolve records[0]
+
+  delete: ({ table, id }) ->
+    new Promise ( resolve, reject ) =>
+      ( @_.base table ).destroy id, (error, records) ->
+        if error?
+          reject error
+        else
+          resolve()
 
 export {
   Base

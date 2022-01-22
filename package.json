@@ -1,5 +1,5 @@
 {
-  "name": "@dashkite/site-data",
+  "name": "@dashkite/airtable-helpers",
   "version": "0.0.0",
   "description": "",
   "main": "build/node/src/index.js",

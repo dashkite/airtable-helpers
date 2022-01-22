@@ -21,8 +21,16 @@ do ({ base, record } = {}) ->
 
     await test "Base", [
 
-      await test "selectOne", ->
+      await test "create", ->
         base = await Base.create configuration.airtable
+        await base.create
+          table: "Test"
+          records: [
+            "Name": "Test"
+            "Notes": "This is a test."
+          ]
+
+      await test "selectOne", ->
         record = await base.selectOne
           table: "Test"
           query: "{Name} = 'Test'"
@@ -30,7 +38,7 @@ do ({ base, record } = {}) ->
 
       await test "update", ->
 
-        notes = records.get "Notes"
+        notes = record.get "Notes"
 
         if notes == "This is a test."
           notes = "This is not a test."
@@ -45,62 +53,13 @@ do ({ base, record } = {}) ->
         
         assert.equal notes, record.get "Notes"
 
+      await test "delete", ->
+        await base.delete
+          table: "Test"
+          id: record.id
+
     ]
 
-    # await test "Panda Strike", [
-
-    #   await test "Site", ->
-    #     Site.configuration = configuration.airtable
-    #     site = await Site.find name: "pandastrike"
-    #     assert.equal "appyqbB9hZDPhtTma", site.base
-
-    #   await test "Page", ->
-    #     page = await site.find path: "home"
-    #     assert page.title?
-    #     assert page.main?[0]?.title?
-    #     assert page?.main?[0]?.image?.default?.url?
-
-    #     # test that we can generate the page
-    #     assert (html page)?
-
-    # ]
-
-    # await test "Finn Mack", [
-
-    #   await test "Site", ->
-    #     Site.configuration = configuration.airtable
-    #     site = await Site.find name: "finnmack"
-    #     assert.equal "appO5rOuvzueUI9P7", site.base
-
-    #   await test "Page", ->
-    #     page = await site.find path: "home"
-    #     assert page.title?
-    #     assert page.main?[0]?.title?
-
-    #     # test that we can generate the page
-    #     assert (html page)?
-
-    # ]
-  
-    # await test "DashKite", [
-
-    #   await test "Content", ->
-    #     Site.configuration = configuration.airtable
-    #     site = await Site.find name: "dashkite"
-    #     content = await Content.find { site, name: "Sites Intro" }
-    #     assert.equal "sites-intro", content.name
-    #     assert.equal "Blog Post Template", content.pages[0].name
-
-    # ]
-
-    # await test "Chand (Different Key)", [
-
-    #   await test "Page", ->
-    #     Site.configuration = configuration.airtable
-    #     site = await Site.find name: "chand-test-01"
-    #     page = await site.find path: "home"
-
-    # ]
 
   ]
 
