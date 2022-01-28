@@ -8,7 +8,10 @@
       "node": "./build/node/src/index.js"
     }
   },
-  "scripts": {
+  "files": [
+    "build/node/src"
+  ],
+"scripts": {
     "test": "genie test"
   },
   "keywords": [],
