@@ -46,20 +46,21 @@ fields = (map) ->
     Meta.mixin type::, do ->
       for name, description of map
         do (name, description) ->
+          _get = (self) -> (self._.get description.from) ? description.default
           if description.list?
             Meta.getter name, ->
-              if ( value = @_.get description.from )?
+              if ( value = _get @ )?
                 description.list.fromID id for id in ( toArray value )
               else
                 []
           else if description.transform?
             Meta.getter name, ->
-              if ( value = @_.get description.from )?
+              if ( value = _get @ )?
                 description.transform.call @, value
           else
             # TODO handle mapping linked objects?
             Meta.property name,
-              get: -> @changes?[ description.from ] ? @_.get description.from
+              get: -> @changes?[ description.from ] ? _get @
               set: (value) ->
                 @changes ?= {}
                 @changes[ description.from ] = value
