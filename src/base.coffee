@@ -4,8 +4,8 @@ import Airtable from "airtable"
 
 class Base
 
-  @create: ({key, base}) ->
-    client = new Airtable apiKey: await getSecret key
+  @create: ({ secret, base }) ->
+    client = new Airtable apiKey: await getSecret secret
     base = client.base base
     Object.assign (new @), _: { client, base }
 

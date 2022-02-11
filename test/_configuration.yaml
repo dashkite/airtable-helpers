@@ -1,4 +1,4 @@
 development:
   airtable:
-    key: dashkite-airtable-api-key
+    secret: dashkite-airtable-api-key
     base: appiBseIwPbqKwxqi
