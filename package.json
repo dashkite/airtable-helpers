@@ -35,7 +35,7 @@
     "@dashkite/sky-presets": "^0.1.1"
   },
   "dependencies": {
-    "@dashkite/dolores": "^0.0.8",
+    "@dashkite/dolores": "^0.0.9",
     "@dashkite/joy": "^0.3.16",
     "airtable": "^0.11.1",
     "marked": "^4.0.8",
