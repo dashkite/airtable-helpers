@@ -20,18 +20,36 @@ class Base
         else
           resolve records[0]
 
-  selectAll: ({ table, query }) ->
+  selectAll: ({ table, query, fields, maxRecords, pageSize, sort, view, cellFormat, timeZone, userLocale }) ->
+    pageSize ?= 100
     table = @_.base table
-    result = if query?
-      table.select filterByFormula: query
-    else
-      table.select()
+    records = []
+
+    parameters = { pageSize }
+    parameters.fields = fields if fields?
+    parameters.filterByFormula = query if query?
+    parameters.maxRecords = maxRecords if maxRecords?
+    parameters.sort = sort if sort?
+    parameters.view = view if view?
+    parameters.cellFormat = cellFormat if cellFormat?
+    parameters.timeZone = timeZone if timeZone?
+    parameters.userLocale = userLocale if userLocale?
+
     new Promise (resolve, reject) ->
-      result.firstPage (error, records) ->
+      accumulate = (pageRecords, fetchNextPage) ->
+        records.push pageRecords...
+        fetchNextPage()
+
+      done = (error) ->
         if error?
           reject error
         else
           resolve records
+   
+      table
+        .select parameters
+        .eachPage accumulate, done
+
 
   find: ({ table, id }) ->
     new Promise (resolve, reject) =>

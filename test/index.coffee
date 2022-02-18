@@ -36,6 +36,12 @@ do ({ base, record } = {}) ->
           query: "{Name} = 'Test'"
         assert.equal "Test", record.get "Name"
 
+      await test "selectAll", ->
+        records = await base.selectAll
+          table: "Pagination Test"
+          pageSize: 2
+        assert.equal 10, records.length
+
       await test "update", ->
 
         notes = record.get "Notes"
