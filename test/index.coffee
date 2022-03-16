@@ -17,9 +17,9 @@ test = (name, f) ->
 
 do ({ base, record } = {}) ->
 
-  print await test "Airtable Helpers", [
+  print await _test "Airtable Helpers", [
 
-    await test "Base", [
+    await _test "Base", [
 
       await test "create", ->
         base = await Base.create configuration.airtable
@@ -30,6 +30,34 @@ do ({ base, record } = {}) ->
             "Notes": "This is a test."
           ]
 
+      await _test "find", [
+        
+        test "single", ->
+          record = await base.find 
+            table: "Pagination Test"
+            id: "recqH6NNMug5nFtC2"
+          assert record?
+
+        test "multiple", ->
+          record = await base.findAll
+            table: "Pagination Test"
+            ids: [ "recqH6NNMug5nFtC2", "rec1HIU8rDLhLgW9g" ]
+          assert.equal 2, record.length
+          
+        test "single not found", ->
+          record = await base.find 
+            table: "Pagination Test"
+            id: "foobar"
+          assert !record?
+
+        test "multiple not found", ->
+          record = await base.findAll
+            table: "Pagination Test"
+            ids: [ "foo", "bar" ]
+          assert.equal 0, record.length
+      
+      ]
+
       await test "selectOne", ->
         record = await base.selectOne
           table: "Test"
@@ -39,8 +67,7 @@ do ({ base, record } = {}) ->
       await test "selectAll", ->
         records = await base.selectAll
           table: "Pagination Test"
-          pageSize: 2
-        assert.equal 10, records.length
+        assert.equal 110, records.length
 
       await test "update", ->
 
@@ -52,6 +79,23 @@ do ({ base, record } = {}) ->
           notes = "This is a test."
 
         record = await base.update
+          table: "Test"
+          id: record.id
+          fields:
+            Notes: notes
+        
+        assert.equal notes, record.get "Notes"
+
+      await test "replace", ->
+
+        notes = record.get "Notes"
+
+        if notes == "This is a test."
+          notes = "This is not a test."
+        else
+          notes = "This is a test."
+
+        record = await base.replace
           table: "Test"
           id: record.id
           fields:

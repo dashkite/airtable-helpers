@@ -55,9 +55,12 @@ class Base
     new Promise (resolve, reject) =>
       ( @_.base table ).find id, (error, record) ->
         if error?
-          reject error
+          if error.statusCode == 404
+            resolve()
+          else
+            reject error
         else
-        resolve record
+          resolve record
 
   findAll: ({ table, ids }) ->
     @selectAll
@@ -78,6 +81,14 @@ class Base
 
 
   update: ({ table, id, fields }) ->
+    new Promise ( resolve, reject ) =>
+      ( @_.base table ).update [ { id, fields } ], (error, records) ->
+        if error?
+          reject error
+        else
+          resolve records[0]
+
+  replace: ({ table, id, fields }) ->
     new Promise ( resolve, reject ) =>
       ( @_.base table ).update [ { id, fields } ], (error, records) ->
         if error?
