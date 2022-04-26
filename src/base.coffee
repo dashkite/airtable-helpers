@@ -90,7 +90,7 @@ class Base
 
   replace: ({ table, id, fields }) ->
     new Promise ( resolve, reject ) =>
-      ( @_.base table ).update [ { id, fields } ], (error, records) ->
+      ( @_.base table ).replace [ { id, fields } ], (error, records) ->
         if error?
           reject error
         else
